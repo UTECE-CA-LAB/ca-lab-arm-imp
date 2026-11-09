@@ -7,24 +7,24 @@ module RegisterFile (
 );
     reg [31:0] regs [15:0];
 
-    initial begin
-    int q;
-        for(q = 0; q < 16; q = q +1) begin
-            regs[q] = 32'dq;
-        end
-    end
+    // integer q;
+    // initial begin
+    //     for(q = 0; q < 16; q = q + 1) begin
+    //         regs[q] = q;
+    //     end
+    // end
 
-    // Read-Register from RF
+    // Read
     assign reg_out_1 = regs[src_1];
     assign reg_out_2 = regs[src_2];
     
-    //Write-Data on Register 
+    //Write 
     integer i;
     always @(posedge clk or posedge rst) begin
         
         if (rst) begin
             for (i = 0; i < 16; i = i + 1)
-                regs[i] <= 32'b0;
+                regs[i] = i;
         end
 
         else if (writeBackEN)

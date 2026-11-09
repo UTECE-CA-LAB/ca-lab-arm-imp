@@ -79,7 +79,6 @@ module ID (
     output imm,
     output [3:0] Dest,
     output [11:0] Shift_operand
-
 );
 
 wire [3:0] Cond, OPcode, Rn, Rm;
@@ -107,6 +106,7 @@ wire [3:0] Src1, Src2;
 assign cond_sel = hazard || ~ cond_flag;
 assign Two_src = ~(imm || uncond_MEM_R_EN);
 assign {WB_EN, MEM_R_EN, MEM_W_EN, EXE_CMD, S_out, B} = cond_sel ? 9'd0 : {uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_EXE_COM, uncond_S, uncond_B};
+assign Src1 = Rn;
 assign Src2 = uncond_MEM_W_EN ? Dest : Rm;
 
 RegisterFile reg_file(
@@ -125,10 +125,9 @@ control_unit cont_unit(
 );
 
 condition_check cond_check(
-  .Cond(Cond),
+  .condition(Cond),
   .SR(SR),
-  .out(cond_flag)
+  .inst_valid(cond_flag)
 );
  
-
 endmodule
