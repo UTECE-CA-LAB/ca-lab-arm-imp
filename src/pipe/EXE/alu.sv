@@ -1,4 +1,4 @@
-module alu (
+module ALU (
     input [3:0] EXE_CMD,
     input [31:0] Val1, Val2,
     input c_in,
@@ -88,6 +88,6 @@ module alu (
     end
 
     assign out = ALU_Res;
-    assign Satus_bits = {v_flag, c_flag, z_flag, n_flag};
+    assign Satus_bits = {n_flag, z_flag, c_flag, v_flag};
 
 endmodule
