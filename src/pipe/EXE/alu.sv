@@ -1,4 +1,4 @@
-module alu (
+module ALU (
     input [3:0] EXE_CMD,
     input [31:0] Val1, Val2,
     input c_in,
