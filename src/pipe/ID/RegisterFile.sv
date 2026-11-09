@@ -1,7 +1,7 @@
 module RegisterFile (
     input clk, rst,
     input writeBackEN,
-    input   [4:0] src_1, src_2, Dest_WB,
+    input   [3:0] src_1, src_2, Dest_WB,
     input  [31:0] Result_WB,
     output [31:0] reg_out_1, reg_out_2
 );

@@ -1,5 +1,5 @@
 module control_unit (
-    input [3:0] OPCode,
+    input [3:0] opcode,
     input [1:0] Mode,
     input S,
     output [8:0] out
@@ -25,7 +25,7 @@ module control_unit (
         end 
 
         else begin
-            case (OPCode)
+            case (opcode)
 
                 4'b0000: begin //NOP
                 end

@@ -1,5 +1,6 @@
 module ID_Reg(
-    input clk, rst, flush, WB_EN_in, MEM_R_EN_in, MEM_W_EN_in, B_in, S_in,
+    input clk, rst,
+    input flush, WB_EN_in, MEM_R_EN_in, MEM_W_EN_in, B_in, S_in,
     input [3:0]  EXE_CMD_in,
     input [31:0] PC_in, Val_Rn_in, Val_Rm_in,
     input [11:0] shift_operand_in, 
@@ -63,71 +64,122 @@ endmodule
 
 
 
-module ID (
-    input  clk, rst, hazard,
-    input [31:0] PC_in, instruction,
+module ID(
+
+    input  clk, rst, 
+    input [31:0] instruction,
+    
+    input [3:0] WB_Rf_address,
+    input [31:0] WB_data,
+    input WB_EN_feedback,
+    output WB_EN, 
+    output [3:0] Rf_address,
+    
+    input  hazard,
     input [3:0] SR,
-    input [3:0] WB_Dest,
-    input [31:0] WB_Value,
-    input WB_WB_EN,
-    output [31:0] PC,
-    output WB_EN, MEM_R_EN, MEM_W_EN, S_out, B, Two_src, 
+    
+    
+    output MEM_R_EN, MEM_W_EN, 
+    output S, B, SS2,
+    // SS2 = stall_src2 = tow_src : it's for hazrd unit which check arm need to stall or not (on src2)  
+    
+    
     output [3:0] EXE_CMD,
     output [31:0] Val_Rn,
     output [31:0] Val_Rm,
-    output [23:0] Signed_imm_24,
+    
     output imm,
-    output [3:0] Dest,
-    output [11:0] Shift_operand
+    output [23:0] Signed_imm_24,
+    output [11:0] Shift_operand   
+
 );
 
-wire [3:0] Cond, OPcode, Rn, Rm;
-wire S;
-wire [1:0] Mode;
+// exe outputs
 
-wire uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_S, uncond_B;
-wire [3:0] uncond_EXE_COM;
-
-assign PC = PC_in;
-
-assign Cond = instruction[31:28];
-assign Mode = instruction[27:26];
-assign imm = instruction[25];
-assign OPcode = instruction[24:21];
-assign S = instruction[20];
-assign Rn = instruction[19:16];
-assign Dest = instruction[15:12];
 assign Shift_operand = instruction[11:0];
-assign Rm = instruction[3:0];
+assign Rf_address = instruction[15:12];
+
+assign imm = instruction[25];
 assign Signed_imm_24 = instruction[23:0];
 
-wire cond_sel, cond_flag;
+
+// RF
+wire [3:0] Rn, Rm;
+assign Rn = instruction[19:16];
+assign Rm = instruction[3:0];
+
 wire [3:0] Src1, Src2;
-assign cond_sel = hazard || ~ cond_flag;
-assign Two_src = ~(imm || uncond_MEM_R_EN);
-assign {WB_EN, MEM_R_EN, MEM_W_EN, EXE_CMD, S_out, B} = cond_sel ? 9'd0 : {uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_EXE_COM, uncond_S, uncond_B};
 assign Src1 = Rn;
-assign Src2 = uncond_MEM_W_EN ? Dest : Rm;
+assign Src2 = uncond_MEM_W_EN ? Rf_address : Rm;
 
 RegisterFile reg_file(
-    .clk(clk), .rst(rst),
-    .writeBackEN(WB_WB_EN),
-    .src_1(Src1), .src_2(Src2), .Dest_WB(WB_Dest),
-    .Result_WB(WB_Value),
-    .reg_out_1(Val_Rn), .reg_out_2(Val_Rm)
+    .clk(clk), 
+    .rst(rst),
+    .writeBackEN(WB_EN_feedback),
+    .src_1(Src1),
+    .src_2(Src2),
+    .Dest_WB(WB_Rf_address),
+    .Result_WB(WB_data),
+    .reg_out_1(Val_Rn),
+    .reg_out_2(Val_Rm)
 );
+
+// condition check
+
+wire [3:0] cond; 
+assign cond = instruction[31:28];
+
+wire inst_valid;
+condition_check cond_check(
+  .condition(cond),
+  .SR(SR),
+  .inst_valid(inst_valid)
+);
+
+wire cond_sel;
+assign cond_sel = hazard || ~inst_valid;
+
+assign SS2 = ~(imm || uncond_MEM_R_EN);
+
+
+// control unit
+
+wire [3:0] opcode;
+wire [1:0] Mode;
+wire inst_S;
+
+assign Mode   = instruction[27:26];
+assign opcode = instruction[24:21];
+assign inst_S = instruction[20];
+
+
+wire [3:0] uncond_EXE_COM;
+wire uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_S, uncond_B;
 
 control_unit cont_unit(
-  .OPCode(OPcode),
+  .opcode(opcode),
   .Mode(Mode),
-  .S(S),
-  .out({uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_EXE_COM, uncond_S, uncond_B})
+  .S(inst_S),
+  .out({uncond_WB_EN, 
+        uncond_MEM_R_EN, 
+        uncond_MEM_W_EN, 
+        uncond_EXE_COM, 
+        uncond_S, 
+        uncond_B })
 );
 
-condition_check cond_check(
-  .condition(Cond),
-  .SR(SR),
-  .inst_valid(cond_flag)
-);
- 
+assign { WB_EN,
+         MEM_R_EN, 
+         MEM_W_EN, 
+         EXE_CMD, 
+         S, 
+         B } = cond_sel ? 9'd0 : {  uncond_WB_EN, 
+                                    uncond_MEM_R_EN, 
+                                    uncond_MEM_W_EN, 
+                                    uncond_EXE_COM, 
+                                    uncond_S, 
+                                    uncond_B };
+
+
+
 endmodule
