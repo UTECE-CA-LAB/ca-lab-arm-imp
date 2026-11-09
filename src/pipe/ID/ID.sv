@@ -1,6 +1,7 @@
 module ID_Reg(
     input clk, rst,
     input flush, WB_EN_in, MEM_R_EN_in, MEM_W_EN_in, B_in, S_in,
+    input imm_in,
     input [3:0]  EXE_CMD_in,
     input [31:0] PC_in, Val_Rn_in, Val_Rm_in,
     input [11:0] shift_operand_in, 
@@ -8,6 +9,7 @@ module ID_Reg(
     input [3:0] Dest_in,          
     
     output reg WB_EN, MEM_R_EN, MEM_W_EN, B, S,
+    output reg imm,
     output reg [3:0]  EXE_CMD,
     output reg [31:0] PC, Val_Rn, Val_Rm,
     output reg [11:0] shift_operand,
@@ -23,6 +25,7 @@ module ID_Reg(
             EXE_CMD <= 4'b0;
             B <= 1'b0;
             S <= 1'b0;
+            imm <= 1'b0;
             PC <= 32'b0;
             Val_Rn <= 32'b0;
             Val_Rm <= 32'b0;
@@ -37,6 +40,7 @@ module ID_Reg(
             EXE_CMD <= 4'b0;
             B <= 1'b0;
             S <= 1'b0;
+            imm <= 1'b0;
             PC <= 32'b0;
             Val_Rn <= 32'b0;
             Val_Rm <= 32'b0;
@@ -51,6 +55,7 @@ module ID_Reg(
             EXE_CMD <= EXE_CMD_in;
             B <= B_in;
             S <= S_in;
+            imm <= imm_in;
             PC <= PC_in;
             Val_Rn <= Val_Rn_in;
             Val_Rm <= Val_Rm_in;
@@ -103,6 +108,31 @@ assign imm = instruction[25];
 assign Signed_imm_24 = instruction[23:0];
 
 
+// control unit
+
+wire [3:0] opcode;
+wire [1:0] Mode;
+wire inst_S;
+
+assign Mode   = instruction[27:26];
+assign opcode = instruction[24:21];
+assign inst_S = instruction[20];
+
+wire [3:0] uncond_EXE_COM;
+wire uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_S, uncond_B;
+
+control_unit cont_unit(
+  .opcode(opcode),
+  .Mode(Mode),
+  .S(inst_S),
+  .out({uncond_WB_EN, 
+        uncond_MEM_R_EN, 
+        uncond_MEM_W_EN, 
+        uncond_EXE_COM, 
+        uncond_S, 
+        uncond_B })
+);
+
 // RF
 wire [3:0] Rn, Rm;
 assign Rn = instruction[19:16];
@@ -140,33 +170,6 @@ wire cond_sel;
 assign cond_sel = hazard || ~inst_valid;
 
 assign SS2 = ~(imm || uncond_MEM_R_EN);
-
-
-// control unit
-
-wire [3:0] opcode;
-wire [1:0] Mode;
-wire inst_S;
-
-assign Mode   = instruction[27:26];
-assign opcode = instruction[24:21];
-assign inst_S = instruction[20];
-
-
-wire [3:0] uncond_EXE_COM;
-wire uncond_WB_EN, uncond_MEM_R_EN, uncond_MEM_W_EN, uncond_S, uncond_B;
-
-control_unit cont_unit(
-  .opcode(opcode),
-  .Mode(Mode),
-  .S(inst_S),
-  .out({uncond_WB_EN, 
-        uncond_MEM_R_EN, 
-        uncond_MEM_W_EN, 
-        uncond_EXE_COM, 
-        uncond_S, 
-        uncond_B })
-);
 
 assign { WB_EN,
          MEM_R_EN, 

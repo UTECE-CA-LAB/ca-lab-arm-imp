@@ -22,7 +22,7 @@ module tb_ARM ();
         rst = 1;
         cycle = 0;
 
-        // Reset اولیه
+        // Reset
         #20;
         rst = 0;
 

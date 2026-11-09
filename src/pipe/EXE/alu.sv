@@ -46,14 +46,14 @@ module alu (
             end
 
             4'b0100: begin // SUB
-                {c_flag, ALU_Res} = {1'b0, Val1} - {1'b0, Val2};
+                {c_flag, ALU_Res} = {1'b0, Val1} + {1'b0, ~Val2} + 33'b1;
                 n_flag = ALU_Res[31];
                 z_flag = (ALU_Res == 32'd0);
                 v_flag = (Val1[31] != Val2[31]) && (ALU_Res[31] == Val2[31]);
             end
 
             4'b0101: begin // SUBC (Subtract with carry/borrow)
-                {c_flag, ALU_Res} = {1'b0, Val1} - {1'b0, Val2} - ~c_in;
+                {c_flag, ALU_Res} = {1'b0, Val1} + {1'b0, ~Val2} + {32'b0, c_in};
                 n_flag = ALU_Res[31];
                 z_flag = (ALU_Res == 32'd0);
                 v_flag = (Val1[31] != Val2[31]) && (ALU_Res[31] == Val2[31]);
@@ -88,6 +88,6 @@ module alu (
     end
 
     assign out = ALU_Res;
-    assign Satus_bits = {v_flag, c_flag, z_flag, n_flag};
+    assign Satus_bits = {n_flag, z_flag, c_flag, v_flag};
 
 endmodule
