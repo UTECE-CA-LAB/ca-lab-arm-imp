@@ -1,41 +1,49 @@
 module EXE (
     input clk, rst,
     input [31:0] PC_in,
-    input WB_EN, MEM_R_EN, MEM_W_EN, B, S,
+    input MEM_R_EN, MEM_W_EN, C, S,
     input [3:0]  EXE_CMD,
     input [31:0] PC, Val_Rn, Val_Rm,
     input [11:0] shift_operand,
     input [23:0] Signed_imm_24,
-    input [3:0]  Dest,
+    input imm,
     output logic [31:0] PC,
+    output reg [3:0] sr,
+    output reg [31:0] ALU_res,
+    output [31:0] branch_addr
 );
 
     assign PC = PC_in;
 
-    wire [31:0] val2;
+    wire [31:0] val2, Signed_imm_24_extended;
+    reg [3:0] status_reg;
+    wire MEM_RorW_EN;
 
-    reg [3:0] sr;
-    always @(posedge clk or posedge rst) begin
+    assign MEM_RorW_EN = MEM_R_EN | MEM_W_EN;
+    assign Signed_imm_24_extended = Signed_imm_24[23] ? {8{1'b1},Signed_imm_24} : {8{1'b0},Signed_imm_24};
+    assign branch_addr = pc_in + Signed_imm_24_extended;
+
+    always @(negedge clk or posedge rst) begin
         if (rst)
             sr <= 4'b0;
-        else
+        else if (S)
             sr <= status_reg;
     end
 
     VAL2_GENERATOR val2_gen(
-    input [31:0] val_Rm,
-    input [11:0] shift_op,
-    input imm,
-    input MEM_RorW_EN,
-    output [31:0] val2
+    .val_Rm(Val_Rm),
+    .shift_op(shift_operand),
+    .imm(imm),
+    .MEM_RorW_EN(MEM_RorW_EN),
+    .val2(val2)
     );
 
     ALU alu (
     .EXE_CMD(EXE_CMD),
-    .Val1(Val_Rn), .Val2(),
-    input c_in,
+    .Val1(Val_Rn), .Val2(val2),
+    c_in(C),
     .Satus_bits(status_reg),
-    output [31:0] out
+    .out(ALU_res)
     );
 
 
