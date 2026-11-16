@@ -59,9 +59,9 @@ module EXE_Reg (
     input [31:0] ALU_res_in, Val_Rm_in,
     input [3:0] Dest_in,
 
-    output WB_EN, MEM_R_EN, MEM_W_EN,
-    output [31:0] ALU_res, Val_Rm,
-    output [3:0] Dest
+    output logic WB_EN, MEM_R_EN, MEM_W_EN,
+    output logic [31:0] ALU_res, Val_Rm,
+    output logic [3:0] Dest
 );
 
     always @(posedge clk or posedge rst) begin
