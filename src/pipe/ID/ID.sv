@@ -80,13 +80,13 @@ module ID(
     input [3:0] WB_Rf_address,
     input [31:0] WB_data,
     input WB_EN_feedback,
-    output WB_EN, 
-    output [3:0] Rf_address,
     
     input  hazard,
     input [3:0] SR,
     
     
+    output WB_EN, 
+    output [3:0] Rf_address,
     output MEM_R_EN, MEM_W_EN, 
     output S, B, SS2,
     // SS2 = stall_src2 = tow_src : it's for hazrd unit which check arm need to stall or not (on src2)  
