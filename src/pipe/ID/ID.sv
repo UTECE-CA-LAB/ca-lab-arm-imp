@@ -1,6 +1,6 @@
 module ID_Reg(
     input clk, rst,
-    input flush, WB_EN_in, MEM_R_EN_in, MEM_W_EN_in, B_in, S_in,
+    input flush, WB_EN_in, MEM_R_EN_in, MEM_W_EN_in, B_in, S_in, C_in,
     input imm_in,
     input [3:0]  EXE_CMD_in,
     input [31:0] PC_in, Val_Rn_in, Val_Rm_in,
@@ -8,7 +8,7 @@ module ID_Reg(
     input [23:0] Signed_imm_24_in, 
     input [3:0] Dest_in,          
     
-    output reg WB_EN, MEM_R_EN, MEM_W_EN, B, S,
+    output reg WB_EN, MEM_R_EN, MEM_W_EN, B, S, C,
     output reg imm,
     output reg [3:0]  EXE_CMD,
     output reg [31:0] PC, Val_Rn, Val_Rm,
@@ -25,6 +25,7 @@ module ID_Reg(
             EXE_CMD <= 4'b0;
             B <= 1'b0;
             S <= 1'b0;
+            C <= 1'b0;
             imm <= 1'b0;
             PC <= 32'b0;
             Val_Rn <= 32'b0;
@@ -40,6 +41,7 @@ module ID_Reg(
             EXE_CMD <= 4'b0;
             B <= 1'b0;
             S <= 1'b0;
+            C <= 1'b0;
             imm <= 1'b0;
             PC <= 32'b0;
             Val_Rn <= 32'b0;
@@ -55,6 +57,7 @@ module ID_Reg(
             EXE_CMD <= EXE_CMD_in;
             B <= B_in;
             S <= S_in;
+            C <= C_in;
             imm <= imm_in;
             PC <= PC_in;
             Val_Rn <= Val_Rn_in;

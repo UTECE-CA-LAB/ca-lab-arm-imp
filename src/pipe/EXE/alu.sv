@@ -88,6 +88,6 @@ module ALU (
     end
 
     assign out = ALU_Res;
-    assign Satus_bits = {n_flag, z_flag, c_flag, v_flag};
+    assign Satus_bits = {z_flag, c_flag, n_flag, v_flag};
 
 endmodule
