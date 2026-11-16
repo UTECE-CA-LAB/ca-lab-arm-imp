@@ -3,7 +3,7 @@ module EXE (
     input [31:0] PC_in,
     input MEM_R_EN, MEM_W_EN, C, S,
     input [3:0]  EXE_CMD,
-    input [31:0] PC, Val_Rn, Val_Rm,
+    input [31:0] Val_Rn, Val_Rm,
     input [11:0] shift_operand,
     input [23:0] Signed_imm_24,
     input imm,
@@ -21,7 +21,7 @@ module EXE (
 
     assign MEM_RorW_EN = MEM_R_EN | MEM_W_EN;
     assign Signed_imm_24_extended = Signed_imm_24[23] ? {8{1'b1},Signed_imm_24} : {8{1'b0},Signed_imm_24};
-    assign branch_addr = pc_in + Signed_imm_24_extended;
+    assign branch_addr = PC_in + Signed_imm_24_extended;
 
     always @(negedge clk or posedge rst) begin
         if (rst)
@@ -52,16 +52,35 @@ endmodule
 
 module EXE_Reg (
     input clk, rst,
-    input [31:0] PC_in,
-    output logic [31:0] PC
+    // input [31:0] PC_in,
+    // output logic [31:0] PC
+    input WB_EN_in, MEM_R_EN_in, MEM_W_EN_in,
+    input [31:0] ALU_res_in, Val_Rm_in,
+    input [3:0] Dest_in,
+
+    output WB_EN, MEM_R_EN, MEM_W_EN,
+    output [31:0] ALU_res, Val_Rm,
+    output [3:0] Dest
 );
 
-    always_ff @(posedge clk or posedge rst) begin
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
-            PC <= 32'b0;
+            //PC <= 32'b0;
+            WB_EN <= 1'b0;
+            MEM_R_EN <= 1'b0;
+            MEM_W_EN <= 1'b0;
+            ALU_res <= 32'b0;
+            Val_Rm <= 32'b0;
+            Dest <= 4'b0;
         end
         else begin
-            PC <= PC_in;
+            //PC <= PC_in;
+            WB_EN <= WB_EN_in;
+            MEM_R_EN <= MEM_R_EN_in;
+            MEM_W_EN <= MEM_W_EN_in;
+            ALU_res <= ALU_res_in;
+            Val_Rm <= Val_Rm_in;
+            Dest <= Dest_in;
         end
     end
 
