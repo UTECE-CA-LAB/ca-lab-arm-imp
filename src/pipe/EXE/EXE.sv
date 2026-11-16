@@ -20,7 +20,7 @@ module EXE (
     wire MEM_RorW_EN;
 
     assign MEM_RorW_EN = MEM_R_EN | MEM_W_EN;
-    assign Signed_imm_24_extended = Signed_imm_24[23] ? {8{1'b1},Signed_imm_24} : {8{1'b0},Signed_imm_24};
+    assign Signed_imm_24_extended = Signed_imm_24[23] ? {8'b11111111,Signed_imm_24} : {8'b00000000,Signed_imm_24};
     assign branch_addr = PC_in + Signed_imm_24_extended;
 
     always @(negedge clk or posedge rst) begin
@@ -40,8 +40,9 @@ module EXE (
 
     ALU alu (
     .EXE_CMD(EXE_CMD),
-    .Val1(Val_Rn), .Val2(val2),
-    c_in(C),
+    .Val1(Val_Rn), 
+    .Val2(val2),
+    .c_in(C),
     .Satus_bits(status_reg),
     .out(ALU_res)
     );

@@ -25,7 +25,7 @@ module condition_check
             4'b0111: inst_valid = ~V;  // !overflow
 
             4'b1000: inst_valid = C && ~Z; // a > b (unsigned)          
-            4'b1001: inst_valid = ~C && Z; // a =< b (unsigned)
+            4'b1001: inst_valid = ~C || Z; // a =< b (unsigned)
 
             4'b1010: inst_valid = (N==V); // a >= b (signed) 
             4'b1011: inst_valid = (N!=V); // a < b (signed)

@@ -20,7 +20,7 @@ module RegisterFile (
     
     //Write 
     integer i;
-    always @(posedge clk or posedge rst) begin
+    always @(negedge clk or posedge rst) begin
         
         if (rst) begin
             for (i = 0; i < 16; i = i + 1)
