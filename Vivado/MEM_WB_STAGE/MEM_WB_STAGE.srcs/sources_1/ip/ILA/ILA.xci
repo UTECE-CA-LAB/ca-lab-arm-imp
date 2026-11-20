@@ -4,7 +4,7 @@
     "xci_name": "ILA",
     "component_reference": "xilinx.com:ip:ila:6.2",
     "ip_revision": "12",
-    "gen_directory": "../../../../IF_STAGE.gen/sources_1/ip/ILA",
+    "gen_directory": "../../../../MEM_WB_STAGE.gen/sources_1/ip/ILA",
     "parameters": {
       "component_parameters": {
         "C_PROBE1023_TYPE": [ { "value": "0", "resolve_type": "user", "format": "long", "usage": "all" } ],
@@ -6263,7 +6263,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "12" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../IF_STAGE.gen/sources_1/ip/ILA" } ],
+        "OUTPUTDIR": [ { "value": "../../../../MEM_WB_STAGE.gen/sources_1/ip/ILA" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],

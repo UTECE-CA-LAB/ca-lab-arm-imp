@@ -4,7 +4,7 @@
     "xci_name": "data_mem",
     "component_reference": "xilinx.com:ip:dist_mem_gen:8.0",
     "ip_revision": "13",
-    "gen_directory": "../../../../EXE_STAGE.gen/sources_1/ip/data_mem",
+    "gen_directory": "../../../../MEM_WB_STAGE.gen/sources_1/ip/data_mem",
     "parameters": {
       "component_parameters": {
         "depth": [ { "value": "2048", "value_src": "user", "resolve_type": "user", "format": "long", "usage": "all" } ],
@@ -87,7 +87,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "13" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "../../../../EXE_STAGE.gen/sources_1/ip/data_mem" } ],
+        "OUTPUTDIR": [ { "value": "../../../../MEM_WB_STAGE.gen/sources_1/ip/data_mem" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2022.2" } ],
