@@ -156,11 +156,27 @@ module ARM (
         .Dest(Dest_mem)
     );
 
+    wire        WB_EN_wb, MEM_R_EN_wb;
+    wire [31:0] ALU_res_wb, Mem_read_value_wb;
+    wire [3:0]  Dest_wb;
+
     MEM_Reg memory_access_reg (
         .clk(clk),
         .rst(rst),
         .PC_in(pc_mem),
-        .PC(pc_wb)
+        .PC(pc_wb),
+
+        .WB_EN_in(WB_EN_mem),
+        .MEM_R_EN_in(MEM_R_EN_mem),
+        .ALU_res_in(ALU_res_mem),
+        .Mem_read_value_in(32'b0),
+        .Dest_in(Dest_mem),
+
+        .WB_EN(WB_EN_wb),
+        .MEM_R_EN(MEM_R_EN_wb),
+        .ALU_res(ALU_res_wb),
+        .Mem_read_value(Mem_read_value_wb),
+        .Dest(Dest_wb)
     );
 
 endmodule
