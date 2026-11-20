@@ -8,7 +8,6 @@ module MEM (
    
     wire [31:0] mem_addr = ALU_res - 32'd1024;
 
-    
     data_mem d_mem (
         .a(mem_addr[10:0]),  
         .d(Val_Rm),           

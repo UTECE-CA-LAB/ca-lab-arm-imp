@@ -21,10 +21,14 @@ module ARM (
     wire        c_id_reg_out;
     wire [31:0] ALU_res_exe, ALU_res_mem;
 
+    wire        WB_EN_wb;
+    wire [3:0]  Dest_wb;
+    wire [31:0] WB_Value;
+
     assign freeze       = 1'b0;
     // assign Branch_taken = 1'b0;
     // assign BranchAddr   = 32'b0;
-    assign flush        = 1'b0;
+    assign flush        = Branch_taken;
 
     IF fetch (
         .clk(clk),
@@ -60,9 +64,9 @@ module ARM (
         .clk(clk), 
         .rst(rst), 
         .instruction(inst_id_in),
-        .WB_Rf_address(4'b0),
-        .WB_data(32'b0),
-        .WB_EN_feedback(1'b0),
+        .WB_Rf_address(Dest_wb),
+        .WB_data(WB_Value),
+        .WB_EN_feedback(WB_EN_wb),
         .hazard(1'b0),
         .SR(status_reg),
 
@@ -156,9 +160,20 @@ module ARM (
         .Dest(Dest_mem)
     );
 
-    wire        WB_EN_wb, MEM_R_EN_wb;
+    wire [31:0] Mem_read_value_mem;
+
+    MEM memory_stage (
+        .clk(clk),
+        .rst(rst),
+        .MEM_W_EN(MEM_W_EN_mem),
+        .MEM_R_EN(MEM_R_EN_mem),
+        .ALU_res(ALU_res_mem),
+        .Val_Rm(Val_Rm_mem),
+        .Mem_read_value(Mem_read_value_mem)
+    );
+
+    wire        MEM_R_EN_wb;
     wire [31:0] ALU_res_wb, Mem_read_value_wb;
-    wire [3:0]  Dest_wb;
 
     MEM_Reg memory_access_reg (
         .clk(clk),
@@ -169,7 +184,7 @@ module ARM (
         .WB_EN_in(WB_EN_mem),
         .MEM_R_EN_in(MEM_R_EN_mem),
         .ALU_res_in(ALU_res_mem),
-        .Mem_read_value_in(32'b0),
+        .Mem_read_value_in(Mem_read_value_mem),
         .Dest_in(Dest_mem),
 
         .WB_EN(WB_EN_wb),
@@ -177,6 +192,13 @@ module ARM (
         .ALU_res(ALU_res_wb),
         .Mem_read_value(Mem_read_value_wb),
         .Dest(Dest_wb)
+    );
+
+    WB write_back_stage (
+        .ALU_res(ALU_res_wb),
+        .Mem_read_value(Mem_read_value_wb),
+        .MEM_R_EN(MEM_R_EN_wb),
+        .WB_Value(WB_Value)
     );
 
 endmodule
