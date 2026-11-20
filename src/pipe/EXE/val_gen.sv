@@ -23,7 +23,7 @@ module VAL2_GENERATOR (
         end 
         else if (imm) begin
         
-            val2 = (rotate_amount) ? base_val : (base_val >> rotate_amount) | (base_val << (32 - rotate_amount));
+            val2 = (rotate_amount == 5'd0) ? base_val : ((base_val >> rotate_amount) | (base_val << (32 - rotate_amount)));
         end 
         else begin
             case (shift)

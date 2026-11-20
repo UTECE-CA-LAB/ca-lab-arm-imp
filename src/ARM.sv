@@ -17,6 +17,10 @@ module ARM (
     wire [31:0] pc_mem;
     wire [31:0] pc_wb;
 
+    reg [3:0]   status_reg;
+    wire        c_id_reg_out;
+    wire [31:0] ALU_res_exe, ALU_res_mem;
+
     assign freeze       = 1'b0;
     // assign Branch_taken = 1'b0;
     // assign BranchAddr   = 32'b0;
@@ -95,7 +99,7 @@ module ARM (
         .MEM_W_EN_in(MEM_W_EN),
         .B_in(B),
         .S_in(S),
-        .C_in(status_reg[2]),
+        .C_in(status_reg[1]),
         .imm_in(imm),
         .EXE_CMD_in(EXE_CMD),
         .PC_in(pc_id),
@@ -121,9 +125,6 @@ module ARM (
         .Dest(Dest_exe)
     );
 
-    reg [3:0] status_reg;
-    wire c_id_reg_out;
-    wire [31:0] ALU_res_exe, ALU_res_mem;
 
     EXE execute(
         .clk(clk), .rst(rst),

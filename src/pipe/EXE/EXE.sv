@@ -9,7 +9,7 @@ module EXE (
     input imm,
     output logic [31:0] PC,
     output reg [3:0] sr,
-    output reg [31:0] ALU_res,
+    output logic [31:0] ALU_res,
     output [31:0] branch_addr
 );
 
