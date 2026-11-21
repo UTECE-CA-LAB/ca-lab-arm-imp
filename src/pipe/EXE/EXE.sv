@@ -21,7 +21,7 @@ module EXE (
 
     assign MEM_RorW_EN = MEM_R_EN | MEM_W_EN;
     assign Signed_imm_24_extended = Signed_imm_24[23] ? {8'b11111111,Signed_imm_24} : {8'b00000000,Signed_imm_24};
-    assign branch_addr = PC_in + Signed_imm_24_extended;
+    assign branch_addr = PC_in + 32'd1 + Signed_imm_24_extended;
 
     always @(negedge clk or posedge rst) begin
         if (rst)

@@ -25,10 +25,16 @@ module ARM (
     wire [3:0]  Dest_wb;
     wire [31:0] WB_Value;
 
-    assign freeze       = 1'b0;
-    // assign Branch_taken = 1'b0;
-    // assign BranchAddr   = 32'b0;
-    assign flush        = Branch_taken;
+    wire        hazard_detected;
+    wire [3:0]  src1_id, src2_id;
+
+    wire        WB_EN_exe;
+    wire [3:0]  Dest_exe;
+    wire        WB_EN_mem;
+    wire [3:0]  Dest_mem;
+
+    assign freeze = hazard_detected;
+    assign flush  = Branch_taken;
 
     IF fetch (
         .clk(clk),
@@ -67,7 +73,7 @@ module ARM (
         .WB_Rf_address(Dest_wb),
         .WB_data(WB_Value),
         .WB_EN_feedback(WB_EN_wb),
-        .hazard(1'b0),
+        .hazard(hazard_detected),
         .SR(status_reg),
 
         .WB_EN(WB_EN),
@@ -77,6 +83,8 @@ module ARM (
         .S(S), 
         .B(B), 
         .SS2(SS2),
+        .src1(src1_id),
+        .src2(src2_id),
         .EXE_CMD(EXE_CMD),
         .Val_Rn(Val_Rn),
         .Val_Rm(Val_Rm),
@@ -85,14 +93,23 @@ module ARM (
         .Shift_operand(Shift_operand)   
     );
 
-    wire        WB_EN_exe;
+    Hazard_Detection_Unit hazard_unit (
+        .src1(src1_id),
+        .src2(src2_id),
+        .Two_src(SS2),
+        .EXE_Dest(Dest_exe),
+        .EXE_WB_EN(WB_EN_exe),
+        .MEM_Dest(Dest_mem),
+        .MEM_WB_EN(WB_EN_mem),
+        .Hazard_Detected(hazard_detected)
+    );
+
     wire        MEM_R_EN_exe, MEM_W_EN_exe;
     wire        S_exe, imm_exe;
     wire [3:0]  EXE_CMD_exe;
     wire [31:0] Val_Rn_exe, Val_Rm_exe;
     wire [11:0] Shift_operand_exe;
     wire [23:0] Signed_imm_24_exe;
-    wire [3:0]  Dest_exe;
 
     ID_Reg decode_reg (
         .clk(clk),
@@ -145,9 +162,8 @@ module ARM (
         .branch_addr(BranchAddr)
     );
 
-    wire WB_EN_mem, MEM_R_EN_mem, MEM_W_EN_mem;
+    wire MEM_R_EN_mem, MEM_W_EN_mem;
     wire [31:0] Val_Rm_mem;
-    wire [3:0] Dest_mem;
 
     EXE_Reg exe_reg(
         .clk(clk), .rst(rst),

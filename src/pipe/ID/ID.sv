@@ -90,6 +90,8 @@ module ID(
     output MEM_R_EN, MEM_W_EN, 
     output S, B, SS2,
     // SS2 = stall_src2 = tow_src : it's for hazrd unit which check arm need to stall or not (on src2)  
+    output [3:0] src1,
+    output [3:0] src2,
     
     
     output [3:0] EXE_CMD,
@@ -141,16 +143,15 @@ wire [3:0] Rn, Rm;
 assign Rn = instruction[19:16];
 assign Rm = instruction[3:0];
 
-wire [3:0] Src1, Src2;
-assign Src1 = Rn;
-assign Src2 = uncond_MEM_W_EN ? Rf_address : Rm;
+assign src1 = Rn;
+assign src2 = uncond_MEM_W_EN ? Rf_address : Rm;
 
 RegisterFile reg_file(
     .clk(clk), 
     .rst(rst),
     .writeBackEN(WB_EN_feedback),
-    .src_1(Src1),
-    .src_2(Src2),
+    .src_1(src1),
+    .src_2(src2),
     .Dest_WB(WB_Rf_address),
     .Result_WB(WB_data),
     .reg_out_1(Val_Rn),
